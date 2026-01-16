@@ -6,7 +6,7 @@ def sample_handler(action: Action):
 
 
 @plugin(name="DemoPlugin")
-def plugin():
+def demo_plugin():
     handlers = {
         "sample_action": sample_handler,
     }

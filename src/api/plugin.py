@@ -1,15 +1,15 @@
 from collections.abc import Iterable
-import typing
+from typing import Any, Callable
 
 
 # TODO : Intent is just a placeholder for now
 class Action:
-    def __init__(self, name: str, intent: str = ""):
+    def __init__(self, name: str, payload: Any):
         self.name = name
-        self.intent = intent
+        self.payload = payload
 
 
-ActionHandlerMap = dict[str, typing.Callable[[Action], None]]
+ActionHandlerMap = dict[str, Callable[[Action], None]]
 PluginData = Iterable[(ActionHandlerMap, list[str])]
 
 
@@ -46,7 +46,7 @@ class Plugin:
 def plugin(name: str) -> Plugin:
 
     def inner(
-        f: typing.Callable[[], PluginData],
+        f: Callable[[], PluginData],
     ) -> Plugin:
         handlers, requires = f()
         return Plugin(name=name, handlers=handlers, requires=requires)

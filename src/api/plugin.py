@@ -9,8 +9,8 @@ class Action:
         self.payload = payload
 
 
-ActionHandlerMap = dict[str, Callable[[Action], None]]
-PluginData = Iterable[(ActionHandlerMap, list[str])]
+ActionHandlerMap = dict[str, Callable[[Action], Any]]
+PluginData = tuple[ActionHandlerMap, list[str]]
 
 
 class Plugin:
@@ -35,15 +35,15 @@ class Plugin:
         return list(self.handlers.keys())
 
     def handle(self, action: Action) -> bool:
-        for action, handler in self.handlers.items():
-            if action == action.name:
+        for action_name, handler in self.handlers.items():
+            if action_name == action.name:
                 print(f"Handling action: {action.name} with plugin: {self.name}")
-                handler(Action)
+                handler(action)
                 return True
         return False
 
 
-def plugin(name: str) -> Plugin:
+def plugin(name: str) -> Callable[[Callable[[], PluginData]], Plugin]:
 
     def inner(
         f: Callable[[], PluginData],

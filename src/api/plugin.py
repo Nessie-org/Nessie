@@ -1,6 +1,10 @@
 from typing import Any, Callable
 
 
+class NoAvailablePluginError(Exception):
+    pass
+
+
 # TODO : Intent is just a placeholder for now
 class Action:
     def __init__(self, name: str, payload: Any):

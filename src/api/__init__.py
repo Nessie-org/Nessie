@@ -1,1 +1,1 @@
-from api.plugin import Plugin, Action, plugin  # noqa: F401
+from api.plugin import Plugin, Action, plugin, NoAvailablePluginError  # noqa: F401

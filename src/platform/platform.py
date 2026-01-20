@@ -1,16 +1,76 @@
 from collections import defaultdict
 
 from api import Plugin
+from api.plugin import Action, NoAvailablePluginError
 
 
 class Platform:
+    plugins: dict[str, list[Plugin]]
+    verbose: bool
 
-    def __init__(self, plugins: list[Plugin] = []):
+    PLUGIN_PRIORITIZATION = "PluginPrioritization"
+
+    def __init__(self, plugins: list[Plugin] = [], verbose: bool = False) -> None:
         self.plugins: dict[str, Plugin] = defaultdict(list)
+        self.verbose = verbose
+
         for plugin in plugins:
             for action in plugin.provided_actions:
                 self.plugins[action].append(plugin)
 
     def register_plugin(self, plugin: Plugin) -> None:
+        """
+        Register a plugin to the platform.
+        Args:
+            plugin (Plugin): The plugin to register.
+        """
         for action in plugin.provided_actions:
             self.plugins[action].append(plugin)
+
+        if self.verbose:
+            print(
+                f"Registered plugin: {plugin.name} for actions: {plugin.provided_actions}"
+            )
+
+    def get_plugin(self, action_name: str, priritization: bool = True) -> Plugin:
+        """
+        Get a plugin for the given action name.
+        If prioritization is enabled, use the prioritization plugin to select the best plugin.
+        Otherwise, return the first available plugin.
+        Args:
+            action_name (str): The name of the action.
+            priritization (bool): Whether to use prioritization.
+        Returns:
+            Plugin: The selected plugin.
+        Raises:
+            NoAvailablePluginError: If no plugin is available for the action.
+        """
+
+        if not priritization:
+            try:
+                return self.plugins.get(action_name, [])[0]
+            except IndexError as e:
+                raise NoAvailablePluginError(
+                    f"No plugin for action {action_name} is available."
+                ) from e
+
+        return self._get_priority_plugin(action_name)
+
+    def _get_priority_plugin(self, action_name: str) -> Plugin:
+        plugins = self._get_all_plugins(action_name)
+
+        if not plugins:
+            raise NoAvailablePluginError(
+                f"No plugin for action {action_name} is available."
+            )
+        try:
+            prioritization: Plugin = self.plugins.get(self.PLUGIN_PRIORITIZATION, [])[0]
+            priority_plugin = prioritization.handle(
+                action=Action(name=self.PLUGIN_PRIORITIZATION, payload=plugins)
+            )
+            return priority_plugin
+        except IndexError:
+            return plugins[0]
+
+    def _get_all_plugins(self, action_name: str) -> list[Plugin]:
+        return self.plugins.get(action_name, [])

@@ -6,7 +6,7 @@ def main():
     plugins = entry_points(group="nessie_plugins")
     print(f"Found {len(plugins)} plugins.")
     for plugin_entry in plugins:
-        plugin_instance = plugin_entry.load()
+        plugin_instance = plugin_entry.load()()
         plugin_instance.activate()
         plugin_instance.deactivate()
 

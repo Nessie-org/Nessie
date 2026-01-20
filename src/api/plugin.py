@@ -42,12 +42,15 @@ class Plugin:
         return False
 
 
-def plugin(name: str) -> Callable[[Callable[[], PluginData]], Plugin]:
+def plugin(name: str) -> Any:
 
     def inner(
         f: Callable[[], PluginData],
-    ) -> Plugin:
-        handlers, requires = f()
-        return Plugin(name=name, handlers=handlers, requires=requires)
+    ) -> Callable[[], Plugin]:
+        def wrapper() -> Plugin:
+            handlers, requires = f()
+            return Plugin(name=name, handlers=handlers, requires=requires)
+
+        return wrapper
 
     return inner

@@ -37,10 +37,11 @@ class Platform:
         Get a specific plugin by name.
         Args:
             plugin_name (str): The name of the plugin.
+            action_name (str): The name of the action the plugin should handle.
         Returns:
-            Plugin: The plugin with the given name.
+            Plugin: The plugin with the given name that can handle the specified action.
         Raises:
-            NoAvailablePluginError: If no plugin with the given name is available.
+            NoAvailablePluginError: If no plugin with the given name for the specified action is available.
         """
 
         for plugin in self.plugins.get(action_name, []):
@@ -60,7 +61,7 @@ class Platform:
         Returns:
             list[str]: A list of plugin names.
         """
-        
+
         actions = [action_name] if action_name else self.plugins
         return [plugin.name for action in actions for plugin in self.plugins.get(action, [])]
 

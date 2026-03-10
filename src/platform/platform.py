@@ -5,18 +5,47 @@ from api.plugin import Action, NoAvailablePluginError
 
 
 class Platform:
+
+    class UnsatisfiedDependencyError(ValueError):
+        pass
+
     plugins: dict[str, list[Plugin]]
     verbose: bool
 
     PLUGIN_PRIORITIZATION = "PluginPrioritization"
 
     def __init__(self, plugins: list[Plugin] = [], verbose: bool = False) -> None:
-        self.plugins: dict[str, Plugin] = defaultdict(list)
+        self.plugins: dict[str, list[Plugin]] = defaultdict(list)
         self.verbose = verbose
 
         for plugin in plugins:
             for action in plugin.provided_actions:
                 self.plugins[action].append(plugin)
+
+    def check_deps(self) -> None:
+        """Check for unsatisfied dependencies among registered plugins.
+        Raises:
+            Platform.UnsatisfiedDependencyError: If there are unsatisfied dependencies.
+        """
+        unsatisfied_deps = self.get_unsatisfied_deps()
+        if unsatisfied_deps:
+            messages = []
+            for dep, dependents in unsatisfied_deps.items():
+                messages.append(f"Unsatisfied dependency '{dep}' required by {', '.join(dependents)}")
+            raise Platform.UnsatisfiedDependencyError("; ".join(messages))
+
+    def get_unsatisfied_deps(self) -> dict[str, list[str]] | None:
+        """Check for unsatisfied dependencies among registered plugins.
+        Returns:
+            dict[str, list[str]] | None: Mapping of unsatisfied dependency to list of plugin names that require it, or None if all dependencies are satisfied.
+        """
+        unsatisfied_deps: dict[str, list[str]] = {}
+        for plugins in self.plugins.values():
+            for plugin in plugins:
+                for dependency in plugin.requires:
+                    if dependency not in self.plugins:
+                        unsatisfied_deps.setdefault(dependency, []).append(plugin.name)
+        return unsatisfied_deps if unsatisfied_deps else None
 
     def register_plugin(self, plugin: Plugin) -> None:
         """

@@ -61,7 +61,40 @@ class Platform:
                 f"Registered plugin: {plugin.name} for actions: {plugin.provided_actions}"
             )
 
-    def get_plugin(self, action_name: str, priritization: bool = True) -> Plugin:
+    def get_specific_plugin(self, plugin_name: str, action_name: str) -> Plugin:
+        """
+        Get a specific plugin by name.
+        Args:
+            plugin_name (str): The name of the plugin.
+            action_name (str): The name of the action the plugin should handle.
+        Returns:
+            Plugin: The plugin with the given name that can handle the specified action.
+        Raises:
+            NoAvailablePluginError: If no plugin with the given name for the specified action is available.
+        """
+
+        for plugin in self.plugins.get(action_name, []):
+            if plugin.name == plugin_name:
+                return plugin
+
+        raise NoAvailablePluginError(f"No plugin with name {plugin_name} for action {action_name} is available.")
+
+    def get_plugin_names(self, action_name: str | None = None) -> list[str]:
+        """
+        Get plugin names that can handle an action.
+
+        Args:
+            action_name (str | None): The name of the action. If None, return
+            plugin names for all registered actions.
+
+        Returns:
+            list[str]: A list of plugin names.
+        """
+
+        actions = [action_name] if action_name else self.plugins
+        return [plugin.name for action in actions for plugin in self.plugins.get(action, [])]
+
+    def get_plugin(self, action_name: str, prioritization: bool = True) -> Plugin:
         """
         Get a plugin for the given action name.
         If prioritization is enabled, use the prioritization plugin to select the best plugin.
@@ -75,7 +108,7 @@ class Platform:
             NoAvailablePluginError: If no plugin is available for the action.
         """
 
-        if not priritization:
+        if not prioritization:
             try:
                 return self.plugins.get(action_name, [])[0]
             except IndexError as e:

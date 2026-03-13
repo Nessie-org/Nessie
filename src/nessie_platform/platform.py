@@ -25,7 +25,8 @@ class Platform:
             plugin = self.plugin_manager.get_plugin(action_name)
 
         action = Action(name=action_name, payload=payload)
-        return plugin.handle(action, self._get_context())
+        plugin.handle(action, self._get_context())
+        return self._ui()
 
     def index(self) -> str:
         return self._ui()

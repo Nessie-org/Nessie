@@ -1,7 +1,7 @@
 ############# ACTIONS ##################
 
 VISUALIZE_GRAPH = "visualise_graph"
-
+LOAD_GRAPH = "load_graph"
 RENDER_UI = "render"
 
 FILTER_GRAPH = "filter_graph"
@@ -10,6 +10,7 @@ ADD_FILTER = "add_filter"
 REMOVE_FILTER = "remove_filter"
 CLEAR_FILTERS = "clear_filters"
 
+OPEN_WORKSPACE = "open_workspace"
 SWITCH_WORKSPACE = "switch_workspace"
 CLOSE_WORKSPACE = "close_workspace"
 CHANGE_VISUALIZER = "change_visualizer"

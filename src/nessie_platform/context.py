@@ -88,7 +88,7 @@ def make_context(plugin_manager: PluginManager, workspace_manger: WorkspaceManag
             Returns the visualized graph at *index* as an HTML string.
             This is the result of the visualization plugin that is currently active for the graph at *index*.
             """
-            return self.perform_action(Action(constants.VISUALIZE_GRAPH, {}), workspace_manger[index].visualiser_name)
+            return self.perform_action(Action(constants.VISUALIZE_GRAPH, self.get_graph_at(index)), workspace_manger[index].visualiser_name)
 
         def get_visualiser_name_at(self, active_index: int) -> str:
             """

@@ -22,7 +22,7 @@ def make_context(plugin_manager: PluginManager, workspace_manger: WorkspaceManag
             """Total number of workspaces. Must be ≥ 1."""
             return len(workspace_manger)
 
-        def get_active_workspace_index(self) -> int:
+        def get_active_workspace_index(self) -> int | None:
             """
             Index of a currently open (and active) workspace.
             Must be within ``[0, get_workspace_count())``.
@@ -94,14 +94,14 @@ def make_context(plugin_manager: PluginManager, workspace_manger: WorkspaceManag
             """
             Returns the name of the visualizer plugin that is currently active for the graph at *index*.
             """
-            return workspace_manger[active_index].visualiser_name
+            return workspace_manger[active_index].visualiser_name or "Nessie Graph Explorer"
 
-        def set_visualiser_at(self, index: int, visualizer_name: str) -> None:
+        def set_visualiser_at(self, index: int, visualiser_name: str) -> None:
             """
-            Sets the visualizer plugin for the graph at *index* to *visualizer_name*.
+            Sets the visualizer plugin for the graph at *index* to *visualiser_name*.
             Must be within ``[0, get_workspace_count())``.
             """
-            workspace_manger[index].visualiser_name = visualizer_name
+            workspace_manger[index].visualiser_name = visualiser_name
 
         ################## FILTERS ##################
 
@@ -131,6 +131,26 @@ def make_context(plugin_manager: PluginManager, workspace_manger: WorkspaceManag
             Must be within ``[0, get_workspace_count())``.
             """
             workspace_manger[index].clear_filters()
+
+        ################ SEARCH ##################
+
+        def get_search_at(self, index: int) -> str:
+            """
+            Returns the current search query for the graph at *index*.
+            Default: empty string.
+            """
+            if index < 0 or index >= self.get_workspace_count():
+                raise IndexError("Workspace index out of range")
+            return workspace_manger[index].search_query
+        
+        def set_search_at(self, index: int, query: str) -> None:
+            """
+            Sets the search query for the graph at *index* to *query*.
+            Must be within ``[0, get_workspace_count())``.
+            """
+            if index < 0 or index >= self.get_workspace_count():
+                raise IndexError("Workspace index out of range")
+            workspace_manger[index].search_query = query
 
         ################ CONSOLE ##################
 

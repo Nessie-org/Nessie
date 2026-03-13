@@ -17,3 +17,5 @@ CHANGE_VISUALIZER = "change_visualizer"
 
 ADD_CONSOLE_MESSAGE = "add_console_message"
 CLEAR_CONSOLE = "clear_console"
+
+SEARCH = "search"

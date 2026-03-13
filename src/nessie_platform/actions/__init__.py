@@ -1,4 +1,4 @@
-from .filters import apply_filters, add_filter, remove_filter
+from .filters import apply_filters, add_filter, remove_filter, search
 from .workspaces import switch_workspace, close_workspace, open_workspace
 from .visualizers import change_visualizer
 from .console import add_message, clear_console
@@ -17,6 +17,7 @@ def platform_plugin():
         constants.CHANGE_VISUALIZER: change_visualizer,
         constants.ADD_CONSOLE_MESSAGE: add_message,
         constants.CLEAR_CONSOLE: clear_console,
+        constants.SEARCH: search,
     }
 
     requirements = {}

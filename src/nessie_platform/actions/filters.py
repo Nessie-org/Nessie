@@ -35,3 +35,10 @@ def remove_filter(action: "Action", context: "Context"):
     apply_filters_action = Action(constants.APPLY_FILTERS, {})
     context.perform_action(apply_filters_action)
 
+def clear_filters(action: "Action", context: "Context"):
+    index = context.get_active_workspace_index()
+    if index is None:
+        return
+    context.clear_filters_at(index)
+    graph = context.get_full_graph_at(index)
+    context.set_graph_at(index, graph)

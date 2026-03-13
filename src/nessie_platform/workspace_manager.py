@@ -11,11 +11,14 @@ class WorkspaceManager:
         self._active_workspace_index = len(self._workspaces) - 1
 
     @property
-    def active_workspace_index(self) -> int:
+    def active_workspace_index(self) -> int | None:
         return self._active_workspace_index
 
     @active_workspace_index.setter
-    def active_workspace_index(self, index: int):
+    def active_workspace_index(self, index: int | None):
+        if index is None:
+            self._active_workspace_index = None
+            return
         if index >= len(self._workspaces) or index < 0:
             raise IndexError
         self._active_workspace_index = index

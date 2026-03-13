@@ -1,7 +1,7 @@
 from nessie_api.models import Action
 
 from nessie_platform.plugin_manager import PluginManager
-from nessie_platform.PluginDTO import PluginDTO
+from nessie_platform.plugin_dto import PluginDTO
 from nessie_platform.context import make_context
 from nessie_platform.workspace_manager import WorkspaceManager
 import nessie_platform.constants as constants

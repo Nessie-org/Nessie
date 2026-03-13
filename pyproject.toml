@@ -1,17 +1,60 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
-name = "nessie"
+name = "nessie-platform"
 version = "0.1.0"
-description = "Add your description here"
+description = "Nessie API - A Python package for the shared models and contracts"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+license = { text = "Apache-2.0" }
+requires-python = ">=3.9"
+authors = [
+    { name = "Mihajlo Milojević", email = "milojevicm374@gmail.com" },
+    { name = "Stefan Ilić", email = "stefanilic3001@gmail.com" },
+    { name = "Aleksa Dejanović", email = "dejanovicaleksa234@gmail.com"}
+]
+keywords = ["nessie", "platform", "plugin-manager"]
+dependencies = [
+    "nessie_api>=0.1.0"
+]
 
+[project.urls]
+Homepage = "https://github.com/Nessie-org/Nessie"
+Repository = "https://github.com/Nessie-org/Nessie"
+Issues = "https://github.com/Nessie-org/Nessie/issues"
 
-[project.entry-points.nessie_plugins]
-plugin_example = "demo_plugin:demo_plugin"
+[tool.hatch.build.targets.wheel]
+packages = ["src/nessie_platform"]
 
-[dependency-groups]
-dev = [
-    "mypy>=1.19.1",
-    "ruff>=0.14.13",
+[tool.black]
+line-length = 88
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = []
+
+[tool.mypy]
+python_version = "3.9"
+strict = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=src/nessie_platform --cov-report=term-missing"
+
+[tool.coverage.run]
+source = ["src/nessie_platform"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
 ]

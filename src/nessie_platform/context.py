@@ -166,5 +166,5 @@ def make_context(plugin_manager: PluginManager, workspace_manger: WorkspaceManag
                 plugin = plugin_manager.get_specific_plugin(plugin_name, action.name)
             else:
                 plugin = plugin_manager.get_plugin(action.name)
-            return plugin.handle(action)
+            return plugin.handle(action, self)
     return InnerContext()

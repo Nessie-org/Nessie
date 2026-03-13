@@ -1,4 +1,5 @@
 from nessie_api.models import Action, FilterExpression
+from nessie_api.models import Graph
 from nessie_api.protocols import Context
 import nessie_platform.constants as constants
 
@@ -10,7 +11,8 @@ def apply_filters(action: "Action", context: "Context"):
         "filters": context.get_active_filters_at(index),
         "graph": context.get_full_graph_at(index),
     })
-    context.perform_action(filter_action)
+    graph: "Graph" = context.perform_action(filter_action)
+    context.set_graph_at(index, graph)
 
 def add_filter(action: "Action", context: "Context"):
     filter_expression = action.payload.get("filter")

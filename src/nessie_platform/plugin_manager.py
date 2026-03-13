@@ -1,10 +1,9 @@
 from collections import defaultdict
+from importlib.metadata import entry_points
 
-from api import Plugin
-from api.plugin import Action, NoAvailablePluginError
+from nessie_api.models import Plugin, Action, NoAvailablePluginError
 
-
-class Platform:
+class PluginManager:
 
     class UnsatisfiedDependencyError(ValueError):
         pass
@@ -14,25 +13,32 @@ class Platform:
 
     PLUGIN_PRIORITIZATION = "PluginPrioritization"
 
-    def __init__(self, plugins: list[Plugin] = [], verbose: bool = False) -> None:
+    def __init__(self, verbose: bool = False) -> None:
         self.plugins: dict[str, list[Plugin]] = defaultdict(list)
         self.verbose = verbose
 
-        for plugin in plugins:
-            for action in plugin.provided_actions:
-                self.plugins[action].append(plugin)
+
+    def discover_plugins(self) -> None:
+        """
+        Discover all plugins available for nessie_platform.
+        """
+        plugins = entry_points(group="nessie_plugins")
+        for plugin_entry in plugins:
+            plugin_instance = plugin_entry.load()()
+            self.register_plugin(plugin_instance)
+
 
     def check_deps(self) -> None:
         """Check for unsatisfied dependencies among registered plugins.
         Raises:
-            Platform.UnsatisfiedDependencyError: If there are unsatisfied dependencies.
+            PluginManager.UnsatisfiedDependencyError: If there are unsatisfied dependencies.
         """
         unsatisfied_deps = self.get_unsatisfied_deps()
         if unsatisfied_deps:
             messages = []
             for dep, dependents in unsatisfied_deps.items():
                 messages.append(f"Unsatisfied dependency '{dep}' required by {', '.join(dependents)}")
-            raise Platform.UnsatisfiedDependencyError("; ".join(messages))
+            raise PluginManager.UnsatisfiedDependencyError("; ".join(messages))
 
     def get_unsatisfied_deps(self) -> dict[str, list[str]] | None:
         """Check for unsatisfied dependencies among registered plugins.
@@ -49,7 +55,7 @@ class Platform:
 
     def register_plugin(self, plugin: Plugin) -> None:
         """
-        Register a plugin to the platform.
+        Register a plugin to the nessie_platform.
         Args:
             plugin (Plugin): The plugin to register.
         """
@@ -79,20 +85,20 @@ class Platform:
 
         raise NoAvailablePluginError(f"No plugin with name {plugin_name} for action {action_name} is available.")
 
-    def get_plugin_names(self, action_name: str | None = None) -> list[str]:
+    def get_available_plugins(self, action_name: str | None = None) -> list[Plugin]:
         """
-        Get plugin names that can handle an action.
+        Get plugins that can handle an action.
 
         Args:
             action_name (str | None): The name of the action. If None, return
             plugin names for all registered actions.
 
         Returns:
-            list[str]: A list of plugin names.
+            list[Plugin]: A list of plugins.
         """
 
         actions = [action_name] if action_name else self.plugins
-        return [plugin.name for action in actions for plugin in self.plugins.get(action, [])]
+        return [plugin for action in actions for plugin in self.plugins.get(action, [])]
 
     def get_plugin(self, action_name: str, prioritization: bool = True) -> Plugin:
         """

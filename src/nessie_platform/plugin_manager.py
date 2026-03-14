@@ -100,7 +100,7 @@ class PluginManager:
         actions = [action_name] if action_name else self.plugins
         return [plugin for action in actions for plugin in self.plugins.get(action, [])]
 
-    def get_plugin(self, action_name: str, prioritization: bool = True) -> Plugin:
+    def get_plugin(self, action_name: str, prioritization: bool = False) -> Plugin:
         """
         Get a plugin for the given action name.
         If prioritization is enabled, use the prioritization plugin to select the best plugin.

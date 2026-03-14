@@ -13,6 +13,7 @@ class Platform:
         self.workspace_manager = WorkspaceManager()
         self.plugin_manager.discover_plugins()
         self.plugin_manager.register_plugin(platform_plugin())
+        self.plugin_manager.check_deps()
 
     def get_plugins(self, action_name: str) -> list[PluginDTO]:
         plugins = self.plugin_manager.get_available_plugins(action_name)
